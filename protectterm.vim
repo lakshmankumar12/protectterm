@@ -15,12 +15,14 @@
 
 let s:num_termbufs = 0
 
+let s:vi_has_termbufs = tempname() . "_vi_session_has_open_terminal_buffers"
+
 au termopen * call s:add1_num_termbufs()
 
 " On opening a new terminal, increment s:num_termbufs
 "
 " If going from 0 to 1 terminal:
-" - open a temp file buffer "exit_vi_despite_termbufs", modify
+" - open a temp file buffer s:vi_has_termbufs, modify
 "   it, but leave it unsaved
 " - ensure 'confirm' turned off
 "
@@ -30,7 +32,7 @@ au termopen * call s:add1_num_termbufs()
 func! s:add1_num_termbufs()
   let s:num_termbufs = s:num_termbufs + 1
   if s:num_termbufs == 1
-    sp /tmp/exit_vi_despite_termbufs
+    exec 'sp' s:vi_has_termbufs
     setl noswf
     %d
     $s/$/\=strftime("%c")/
@@ -44,15 +46,15 @@ endfunc
 au termclose * call s:sub1_num_termbufs()
 
 " On closing a terminal, decrement s:num_termbufs. If there are
-" now no more terminals, delete the "exit_vi_despite_termbufs"
+" now no more terminals, delete the s:vi_has_termbufs
 " buffer so an exit attempt has no excuse to fail, at least not
 " due to terminals. Also restore 'confirm' to its usual value
 
 func! s:sub1_num_termbufs()
   let s:num_termbufs = s:num_termbufs - 1
   if s:num_termbufs == 0
-    if bufexists("/tmp/exit_vi_despite_termbufs")
-      bd! /tmp/exit_vi_despite_termbufs
+    if bufexists(s:vi_has_termbufs)
+      exec 'bd!' s:vi_has_termbufs
     endif
     let &cf = s:cf_sav
   endif
@@ -60,7 +62,7 @@ endfunc
 
 " When trying exit with terminals running, vi will show up some
 " unsaved buffer for your consideration. If this is the
-" "exit_vi_despite_termbufs" buffer, you don't really need to see
+" s:vi_has_termbufs buffer, you don't really need to see
 " it: so have vi switch to something other buffer immediately
 
-au bufwinenter /tmp/exit_vi_despite_termbufs bn
+exec "au bufwinenter" s:vi_has_termbufs "bn"
