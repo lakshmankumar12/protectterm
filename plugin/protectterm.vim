@@ -36,8 +36,10 @@ func! s:add1_num_termbufs()
     setl noswf
     %d
     $s/$/\=strftime("%c")/
+    call append(line('^'), "You can close this buffer with a bn! or just close window with a q!")
+    call append(line('^'), "You have some open terminal buffers. Close them first")
     setl ro
-    close
+    close!
     let s:cf_sav = &cf
     set nocf
   endif
@@ -65,4 +67,4 @@ endfunc
 " s:vi_has_termbufs buffer, you don't really need to see
 " it: so have vi switch to something other buffer immediately
 
-exec "au bufwinenter" s:vi_has_termbufs "bn"
+exec "au bufwinenter" s:vi_has_termbufs "bn!"
