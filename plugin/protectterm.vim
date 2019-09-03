@@ -61,10 +61,3 @@ func! s:sub1_num_termbufs()
     let &cf = s:cf_sav
   endif
 endfunc
-
-" When trying exit with terminals running, vi will show up some
-" unsaved buffer for your consideration. If this is the
-" s:vi_has_termbufs buffer, you don't really need to see
-" it: so have vi switch to something other buffer immediately
-
-exec "au bufwinenter" s:vi_has_termbufs "bn!"
