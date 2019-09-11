@@ -32,6 +32,7 @@ au termopen * call s:add1_num_termbufs()
 func! s:add1_num_termbufs()
   let s:num_termbufs = s:num_termbufs + 1
   if s:num_termbufs == 1
+    let l:saveWin = win_getid()
     exec 'sp' s:vi_has_termbufs
     setl noswf
     %d
@@ -42,6 +43,7 @@ func! s:add1_num_termbufs()
     close!
     let s:cf_sav = &cf
     set nocf
+    call win_gotoid(l:saveWin)
   endif
 endfunc
 
